@@ -1,8 +1,7 @@
 package coffee_machine
 
 type Beverage struct {
-	name string
-	recipe Recipe
+	Recipe Recipe
 }
 
 type Recipe struct {
@@ -11,20 +10,20 @@ type Recipe struct {
 }
 
 type Content struct {
-	ingredient Ingredient
-	qty int
+	Ingredient Ingredient
+	Qty int
 }
 
 func NewBeverage(name string, recipe Recipe) *Beverage {
-	return &Beverage{name: name, recipe: recipe}
+	return &Beverage{Recipe: recipe}
 }
 
-func NewRecipe(name string, contents []Content) *Recipe {
-	return &Recipe{Name: name, Contents: contents}
+func NewRecipe(name string, contents []Content) (*Recipe, error) {
+	return &Recipe{Name: name, Contents: contents}, nil
 }
 
-func NewContent(ingredient Ingredient, qty int) *Content {
-	return &Content{ingredient: ingredient, qty: qty}
+func NewContent(ingredient Ingredient, qty int) (*Content, error) {
+	return &Content{Ingredient: ingredient, Qty: qty}, nil
 }
 
 type RecipeRepo interface {

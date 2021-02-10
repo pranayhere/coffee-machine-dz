@@ -13,7 +13,12 @@ func NewIngredientService(repo cm.IngredientRepo) *IngredientService {
 }
 
 func (in *IngredientService) Save(name string) error {
-	err := in.ingredientRepo.Save(cm.NewIngredient(name))
+	ingd, err := cm.NewIngredient(name)
+	if err != nil {
+		return err
+	}
+
+	err = in.ingredientRepo.Save(ingd)
 	if err != nil {
 		return err
 	}

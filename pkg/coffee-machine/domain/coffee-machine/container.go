@@ -10,15 +10,15 @@ type Container struct {
 	Qty int
 }
 
-func NewContainer(cap, qty int, ingredient Ingredient) *Container {
+func NewContainer(cap, qty int, ingredient Ingredient) (*Container, error) {
 	return &Container{
 		Cap: cap,
 		Qty: qty,
 		Ingredient: ingredient,
-	}
+	}, nil
 }
 
-func (ic *Container) dispense(qty int) (Ingredient, error){
+func (ic *Container) Dispense(qty int) (Ingredient, error){
 	if qty > ic.Qty {
 		return Ingredient{}, ErrNotEnoughIngredient
 	}

@@ -4,8 +4,8 @@ type Ingredient struct {
 	Name string
 }
 
-func NewIngredient(name string) *Ingredient {
-	return &Ingredient{Name: name}
+func NewIngredient(name string) (*Ingredient, error) {
+	return &Ingredient{Name: name}, nil
 }
 
 type IngredientRepo interface {

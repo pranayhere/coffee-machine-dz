@@ -21,11 +21,23 @@ func (cs *ContainerService) Save(cap, qty int, ingredientName string) error {
 		return err
 	}
 
-	err = cs.containerRepo.Save(cm.NewContainer(cap, qty, *ingd))
+	container, err := cm.NewContainer(cap, qty, *ingd)
 	if err != nil {
 		return err
 	}
 
+	err = cs.containerRepo.Save(container)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (cs *ContainerService) Update(container *cm.Container) error {
+	if err := cs.containerRepo.Save(container); err != nil {
+		return err
+	}
 	return nil
 }
 

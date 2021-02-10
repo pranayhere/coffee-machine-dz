@@ -4,30 +4,30 @@ import (
 	"coffee-machine-dz/pkg"
 	app "coffee-machine-dz/pkg/coffee-machine/application"
 	cm "coffee-machine-dz/pkg/coffee-machine/infrastructure/coffee-machine"
+	"coffee-machine-dz/pkg/common/cmd"
 	"log"
 )
 
 func main() {
 	log.Println("starting coffee-machine")
+	ctx := cmd.Context()
 
-	//ctx := cmd.Context()
+	machine := createCoffeeMachine()
+	drinks := []string{"hot_coffee", "hot_tea", "black_tea"}
 
-	createCoffeeMachine()
-	//cm := createCoffeeMachine()
+	go func() {
+		machine.Start()
+		machine.MakeDrink(drinks)
+		machine.MakeDrink(drinks)
+		machine.MakeDrink(drinks)
+		machine.MakeDrink(drinks)
+	}()
 
-	//drinks := []string{"coffee", "tea", "coffee"}
-	//cm.Start()
-	//
-	//go func() {
-	//	cm.MakeDrink(drinks)
-	//	cm.MakeDrink(drinks)
-	//	cm.MakeDrink(drinks)
-	//
-	//	cm.Stop()
-	//}()
-	//
-	//<-ctx.Done()
-	//log.Println("Stopping coffee-machine")
+	<-ctx.Done()
+
+	log.Println("Stopping coffee-machine")
+	machine.Stop()
+	log.Println("coffee-machine Stopped")
 }
 
 func createCoffeeMachine() *app.CoffeeMachineService {
@@ -52,12 +52,5 @@ func createCoffeeMachine() *app.CoffeeMachineService {
 		panic(err)
 	}
 
-	//ingd, err := ingdSvc.ByName("hot_water")
-	//if err != nil {
-	//	panic(err)
-	//}
-	//
-	//fmt.Println(ingd.Name)
-
-	return app.NewCoffeeMachineService()
+	return app.NewCoffeeMachineService(*ingdSvc, *containerSvc, *recipeSvc)
 }

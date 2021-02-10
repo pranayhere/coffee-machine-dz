@@ -24,12 +24,20 @@ func (rs *RecipeService) Save(name string, ingredients map[string]int) error {
 			return err
 		}
 
-		content := cm.NewContent(*ingd, qty)
+		content, err := cm.NewContent(*ingd, qty)
+		if err != nil {
+			return err
+		}
+
 		contents = append(contents, *content)
 	}
 	
-	recipe := cm.NewRecipe(name, contents)
-	err := rs.recipeRepo.Save(recipe)
+	recipe, err  := cm.NewRecipe(name, contents)
+	if err != nil {
+		return err
+	}
+
+	err = rs.recipeRepo.Save(recipe)
 	if err != nil {
 		return err
 	}
