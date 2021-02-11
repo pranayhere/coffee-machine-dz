@@ -2,6 +2,7 @@ package main
 
 import (
 	"coffee-machine-dz/pkg"
+	alerting "coffee-machine-dz/pkg/alerting/application"
 	app "coffee-machine-dz/pkg/coffee-machine/application"
 	cm "coffee-machine-dz/pkg/coffee-machine/infrastructure/coffee-machine"
 	"coffee-machine-dz/pkg/common/cmd"
@@ -52,5 +53,7 @@ func createCoffeeMachine() *app.CoffeeMachineService {
 		panic(err)
 	}
 
-	return app.NewCoffeeMachineService(*ingdSvc, *containerSvc, *recipeSvc)
+	alertingSvc := alerting.NewAlertingService()
+
+	return app.NewCoffeeMachineService(*ingdSvc, *containerSvc, *recipeSvc, *alertingSvc)
 }

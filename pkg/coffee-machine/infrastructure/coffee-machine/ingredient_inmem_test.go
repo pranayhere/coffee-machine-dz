@@ -12,7 +12,7 @@ func TestIngredientMemRepo(t *testing.T) {
 
 	ingd := addIngredient(t, repo, "hot_milk")
 
-	// test idempotench
+	// test idempotency
 	_ = addIngredient(t, repo, "hot_milk")
 
 	repoIngd, err := repo.ByName("hot_milk")

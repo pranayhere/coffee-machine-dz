@@ -1,6 +1,7 @@
 package application
 
 import (
+	alerting "coffee-machine-dz/pkg/alerting/application"
 	coffee_machine "coffee-machine-dz/pkg/coffee-machine/domain/coffee-machine"
 	"errors"
 	"fmt"
@@ -11,6 +12,7 @@ type CoffeeMachineService struct {
 	ingdSvc IngredientService
 	containerSvc ContainerService
 	recipeSvc RecipeService
+	alertingSvc alerting.AlertingService
 
 	jobs chan string
 	results chan RecipeError
@@ -23,7 +25,7 @@ type RecipeError struct {
 	err error
 }
 
-func NewCoffeeMachineService(ingdSvc IngredientService, containerSvc ContainerService, recipeSvc RecipeService) *CoffeeMachineService {
+func NewCoffeeMachineService(ingdSvc IngredientService, containerSvc ContainerService, recipeSvc RecipeService, alertingSvc alerting.AlertingService) *CoffeeMachineService {
 	var workerWg sync.WaitGroup
 	var producerWg sync.WaitGroup
 
@@ -80,8 +82,7 @@ func (cm *CoffeeMachineService) result() {
 	for result := range cm.results {
 		fmt.Println("Result Error is : ", result.recipe , " err : ", result.err)
 		if result.err != nil {
-			// call alerting service
-			fmt.Println("err : ", result.err)
+			cm.alertingSvc.Alert(result.err)
 		} else {
 			fmt.Println("serving you delicious " + result.recipe.Name)
 		}

@@ -28,10 +28,29 @@ func TestContainerService_Update(t *testing.T) {
 
 	repoContainer, _ := containerSvc.ByName("hot_water")
 	repoContainer.Qty = 100
-	containerSvc.Update(repoContainer)
+	_ = containerSvc.Update(repoContainer)
 
 	updatedContainer, _ := containerSvc.ByName("hot_water")
 	assert.EqualValues(t, 100, updatedContainer.Qty)
+}
+
+func TestContainerService_Refill(t *testing.T) {
+	containerSvc := createContainerSvc()
+
+	err := containerSvc.Save(500, 500, "hot_water")
+	assert.NoError(t, err)
+
+	container, err := containerSvc.ByName("hot_water")
+	assert.NoError(t, err)
+
+	container.Dispense(100)
+	containerSvc.Update(container)
+	assert.EqualValues(t, 400, container.Qty)
+
+	containerSvc.Refill("hot_water", 500)
+	updated, err := containerSvc.ByName("hot_water")
+	assert.NoError(t, err)
+	assert.EqualValues(t, 500, updated.Qty)
 }
 
 func createContainerSvc() *application.ContainerService {
