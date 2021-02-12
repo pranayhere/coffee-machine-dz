@@ -6,8 +6,8 @@ var ErrNotEnoughIngredient = errors.New("not enough ingredient")
 
 type Container struct {
 	Cap int
-	Ingredient Ingredient
 	Qty int
+	Ingredient Ingredient
 }
 
 func NewContainer(cap, qty int, ingredient Ingredient) (*Container, error) {

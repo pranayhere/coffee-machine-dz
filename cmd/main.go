@@ -5,30 +5,27 @@ import (
 	alerting "coffee-machine-dz/pkg/alerting/application"
 	app "coffee-machine-dz/pkg/coffee-machine/application"
 	cm "coffee-machine-dz/pkg/coffee-machine/infrastructure/coffee-machine"
-	"coffee-machine-dz/pkg/common/cmd"
 	"log"
+	"sync"
 )
 
 func main() {
 	log.Println("starting coffee-machine")
-	ctx := cmd.Context()
-
 	machine := createCoffeeMachine()
 	drinks := []string{"hot_coffee", "hot_tea", "black_tea"}
+
+	var wg sync.WaitGroup
+	wg.Add(1)
 
 	go func() {
 		machine.Start()
 		machine.MakeDrink(drinks)
-		machine.MakeDrink(drinks)
-		machine.MakeDrink(drinks)
-		machine.MakeDrink(drinks)
+		machine.Stop()
+
+		wg.Done()
 	}()
 
-	<-ctx.Done()
-
-	log.Println("Stopping coffee-machine")
-	machine.Stop()
-	log.Println("coffee-machine Stopped")
+	wg.Wait()
 }
 
 func createCoffeeMachine() *app.CoffeeMachineService {

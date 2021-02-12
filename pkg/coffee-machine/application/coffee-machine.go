@@ -16,8 +16,10 @@ type CoffeeMachineService struct {
 
 	jobs chan string
 	results chan RecipeError
+
 	workerWg sync.WaitGroup
 	producerWg sync.WaitGroup
+	resultWg sync.WaitGroup
 }
 
 type RecipeError struct {
@@ -28,22 +30,26 @@ type RecipeError struct {
 func NewCoffeeMachineService(ingdSvc IngredientService, containerSvc ContainerService, recipeSvc RecipeService, alertingSvc alerting.AlertingService) *CoffeeMachineService {
 	var workerWg sync.WaitGroup
 	var producerWg sync.WaitGroup
+	var resultWg sync.WaitGroup
 
 	return &CoffeeMachineService{
 		ingdSvc: ingdSvc,
 		containerSvc: containerSvc,
 		recipeSvc: recipeSvc,
+		alertingSvc: alertingSvc,
 
 		jobs: make(chan string, 5),
 		results: make(chan RecipeError, 5),
 		workerWg: workerWg,
 		producerWg: producerWg,
+		resultWg : resultWg,
 	}
 }
 
 func (cm *CoffeeMachineService) Start() {
+	cm.resultWg.Add(1)
 	go cm.result()
-	go cm.createWorkerPool(3)
+	cm.createWorkerPool(3)
 }
 
 func (cm *CoffeeMachineService) MakeDrink(order []string) {
@@ -53,7 +59,6 @@ func (cm *CoffeeMachineService) MakeDrink(order []string) {
 
 func (cm *CoffeeMachineService) process(order []string) {
 	for _, s := range order {
-		fmt.Println("order : " + s)
 		cm.jobs <- s
 	}
 
@@ -79,6 +84,8 @@ func (cm *CoffeeMachineService) worker() {
 }
 
 func (cm *CoffeeMachineService) result() {
+	defer cm.resultWg.Done()
+
 	for result := range cm.results {
 		fmt.Println("Result Error is : ", result.recipe , " err : ", result.err)
 		if result.err != nil {
@@ -102,6 +109,8 @@ func (cm *CoffeeMachineService) Stop() {
 
 	cm.workerWg.Wait()
 	close(cm.results)
+
+	cm.resultWg.Wait()
 }
 
 func (cm *CoffeeMachineService) DispenseIngredient(recipe coffee_machine.Recipe) error {
