@@ -8,17 +8,16 @@ import (
 )
 
 type CoffeeMachineService struct {
-	ingdSvc      IngredientSvc
-	containerSvc ContainerSvc
-	recipeSvc    RecipeSvc
-	alertingSvc  alerting.AlertingSvc
-
-	Orders  chan string      // jobs
+	IngdSvc      IngredientSvc
+	ContainerSvc ContainerSvc
+	RecipeSvc    RecipeSvc
+	AlertingSvc  alerting.AlertingSvc
 
 	workerWg   sync.WaitGroup
 	producerWg sync.WaitGroup
 
-	mutex sync.Mutex
+	Orders chan string // jobs
+	mutex  sync.Mutex
 }
 
 type RecipeError struct {
@@ -33,12 +32,12 @@ func NewCoffeeMachineService(ingdSvc IngredientSvc, containerSvc ContainerSvc, r
 	var mutex sync.Mutex
 
 	return &CoffeeMachineService{
-		ingdSvc:      ingdSvc,
-		containerSvc: containerSvc,
-		recipeSvc:    recipeSvc,
-		alertingSvc:  alertingSvc,
+		IngdSvc:      ingdSvc,
+		ContainerSvc: containerSvc,
+		RecipeSvc:    recipeSvc,
+		AlertingSvc:  alertingSvc,
 
-		Orders:  make(chan string, 5),
+		Orders: make(chan string, 5),
 
 		workerWg:   workerWg,
 		producerWg: producerWg,
@@ -59,7 +58,7 @@ type CoffeeMachineSvc interface {
 }
 
 func (cm *CoffeeMachineService) Init(outlets int) *CoffeeMachineService {
-	cm.createWorkerPool(outlets)
+	cm.createWorkerPool(outlets, cm.Orders)
 	return cm
 }
 
@@ -78,17 +77,17 @@ func (cm *CoffeeMachineService) process(order []string) {
 }
 
 // Process the Order and create the recipe
-func (cm *CoffeeMachineService) worker() {
+func (cm *CoffeeMachineService) Worker(Orders <-chan string) {
 	defer cm.workerWg.Done()
 
-	for order := range cm.Orders {
-		recipe, err := cm.recipeSvc.ByName(order)
+	for order := range Orders {
+		recipe, err := cm.RecipeSvc.ByName(order)
 		if err != nil {
-			cm.alertingSvc.Alert(err)
+			cm.AlertingSvc.Alert(err)
 		} else {
 			r, err := cm.DispenseIngredient(*recipe)
 			if err != nil {
-				cm.alertingSvc.Alert(err)
+				cm.AlertingSvc.Alert(err)
 			} else {
 				beverage := coffee_machine.NewBeverage(r.Name, *r)
 				beverage.Serve()
@@ -97,12 +96,11 @@ func (cm *CoffeeMachineService) worker() {
 	}
 }
 
-
 // Create workers equal to number of outlets
-func (cm *CoffeeMachineService) createWorkerPool(noOfOutlets int) {
+func (cm *CoffeeMachineService) createWorkerPool(noOfOutlets int, Orders <-chan string) {
 	for i := 0; i < noOfOutlets; i++ {
 		cm.workerWg.Add(1)
-		go cm.worker()
+		go cm.Worker(Orders)
 	}
 }
 
@@ -120,7 +118,7 @@ func (cm *CoffeeMachineService) DispenseIngredient(recipe coffee_machine.Recipe)
 	defer cm.mutex.Unlock()
 
 	for _, content := range recipe.Contents {
-		container, err := cm.containerSvc.ByName(content.Ingredient.Name)
+		container, err := cm.ContainerSvc.ByName(content.Ingredient.Name)
 		if err != nil {
 			return nil, errors.New(recipe.Name + " cannot be prepared because " + content.Ingredient.Name + " is not available")
 		}
@@ -131,9 +129,9 @@ func (cm *CoffeeMachineService) DispenseIngredient(recipe coffee_machine.Recipe)
 	}
 
 	for _, content := range recipe.Contents {
-		container, _ := cm.containerSvc.ByName(content.Ingredient.Name)
+		container, _ := cm.ContainerSvc.ByName(content.Ingredient.Name)
 		_, _ = container.Dispense(content.Qty)
-		err := cm.containerSvc.Update(container)
+		err := cm.ContainerSvc.Update(container)
 		if err != nil {
 			return nil, err
 		}
