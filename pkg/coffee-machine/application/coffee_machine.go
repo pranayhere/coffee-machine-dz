@@ -134,12 +134,15 @@ func (cm *CoffeeMachineService) DispenseIngredient(recipe coffee_machine.Recipe)
 			return nil, errors.New(recipe.Name + " cannot be prepared because " + content.Ingredient.Name + " is not available")
 		}
 
-		_, err = container.Dispense(content.Qty)
-		if errors.Is(err, coffee_machine.ErrNotEnoughIngredient) {
+		if container.Qty < content.Qty {
 			return nil, errors.New(recipe.Name + " cannot be prepared because item " + container.Ingredient.Name + " is not sufficient")
 		}
+	}
 
-		err = cm.containerSvc.Update(container)
+	for _, content := range recipe.Contents {
+		container, _ := cm.containerSvc.ByName(content.Ingredient.Name)
+		_, _ = container.Dispense(content.Qty)
+		err := cm.containerSvc.Update(container)
 		if err != nil {
 			return nil, err
 		}
