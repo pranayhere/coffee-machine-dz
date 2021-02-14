@@ -29,7 +29,7 @@ func TestCoffeeMachineService(t *testing.T) {
 		Recipe    TestRecipe
 
 		ExpectedErr bool
-		Error   error
+		Error       error
 	}{
 		{
 			TestName:    "Prepared: Hot Coffee",
@@ -37,23 +37,23 @@ func TestCoffeeMachineService(t *testing.T) {
 			Container:   TestContainer{100, 100, "hot_water"},
 			Recipe:      TestRecipe{"hot_coffee", map[string]int{"hot_water": 100}},
 			ExpectedErr: false,
-			Error: nil,
+			Error:       nil,
 		},
 		{
-			TestName: "Ingredient Not Available",
-			Order:    "hot_tea",
-			Container: TestContainer{100, 100, "hot_tea"},
+			TestName:    "Ingredient Not Available",
+			Order:       "hot_tea",
+			Container:   TestContainer{100, 100, "hot_tea"},
 			Recipe:      TestRecipe{"hot_tea", map[string]int{"ginger_syrup": 100}},
 			ExpectedErr: true,
-			Error: errors.New("hot_tea cannot be prepared because ginger_syrup is not available"),
+			Error:       errors.New("hot_tea cannot be prepared because ginger_syrup is not available"),
 		},
 		{
-			TestName: "Insufficient Ingredients",
-			Order:    "hot_tea",
-			Container: TestContainer{100, 50, "ginger_syrup"},
+			TestName:    "Insufficient Ingredients",
+			Order:       "hot_tea",
+			Container:   TestContainer{100, 50, "ginger_syrup"},
 			Recipe:      TestRecipe{"hot_tea", map[string]int{"ginger_syrup": 100}},
 			ExpectedErr: true,
-			Error: errors.New("hot_tea cannot be prepared because item ginger_syrup is not sufficient"),
+			Error:       errors.New("hot_tea cannot be prepared because item ginger_syrup is not sufficient"),
 		},
 	}
 	for _, c := range testCases {
