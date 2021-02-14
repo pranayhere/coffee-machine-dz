@@ -6,6 +6,7 @@ type IngredientService struct {
 	ingredientRepo cm.IngredientRepo
 }
 
+// New
 func NewIngredientService(repo cm.IngredientRepo) *IngredientService {
 	return &IngredientService{
 		ingredientRepo: repo,
@@ -13,7 +14,10 @@ func NewIngredientService(repo cm.IngredientRepo) *IngredientService {
 }
 
 type IngredientSvc interface {
+	// Save the Ingredient
 	Save(name string) error
+
+	// Return the Ingredient by name
 	ByName(name string) (*cm.Ingredient, error)
 }
 

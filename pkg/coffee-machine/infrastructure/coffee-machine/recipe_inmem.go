@@ -11,17 +11,20 @@ type RecipeMemRepo struct {
 	recipes map[string]cm.Recipe
 }
 
+// New
 func NewRecipeMemRepo() *RecipeMemRepo {
 	return &RecipeMemRepo{
 		recipes: make(map[string]cm.Recipe),
 	}
 }
 
+// Save
 func (m *RecipeMemRepo) Save(recipe *cm.Recipe) error {
 	m.recipes[recipe.Name] = *recipe
 	return nil
 }
 
+// Fetch by name
 func (m *RecipeMemRepo) ByName(name string) (*cm.Recipe, error) {
 	recipe, ok := m.recipes[name]
 	if !ok {

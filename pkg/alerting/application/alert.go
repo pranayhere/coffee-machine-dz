@@ -7,11 +7,13 @@ import (
 
 type AlertingService struct{}
 
+// New
 func NewAlertingService() *AlertingService {
 	return &AlertingService{}
 }
 
 type AlertingSvc interface {
+	// Alert the err
 	Alert(err error)
 }
 

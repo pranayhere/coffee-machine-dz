@@ -13,6 +13,7 @@ type ContainerMemRepo struct {
 	rwm        sync.RWMutex
 }
 
+// New
 func NewContainerMemRepo() *ContainerMemRepo {
 	return &ContainerMemRepo{
 		containers: make(map[string]cm.Container),
@@ -20,6 +21,7 @@ func NewContainerMemRepo() *ContainerMemRepo {
 	}
 }
 
+// Save
 func (m *ContainerMemRepo) Save(containerToSave *cm.Container) error {
 	m.rwm.Lock()
 	defer m.rwm.Unlock()
@@ -28,6 +30,7 @@ func (m *ContainerMemRepo) Save(containerToSave *cm.Container) error {
 	return nil
 }
 
+// Fetch by name
 func (m *ContainerMemRepo) ByName(name string) (*cm.Container, error) {
 	m.rwm.RLock()
 	defer m.rwm.RUnlock()

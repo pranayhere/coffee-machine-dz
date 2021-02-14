@@ -28,6 +28,7 @@ type RecipeError struct {
 	err    error
 }
 
+// New
 func NewCoffeeMachineService(ingdSvc IngredientSvc, containerSvc ContainerSvc, recipeSvc RecipeSvc, alertingSvc alerting.AlertingSvc) *CoffeeMachineService {
 	var workerWg sync.WaitGroup
 	var producerWg sync.WaitGroup
@@ -52,15 +53,21 @@ func NewCoffeeMachineService(ingdSvc IngredientSvc, containerSvc ContainerSvc, r
 }
 
 type CoffeeMachineSvc interface {
-	Init(outlets int)
+	// initialize the coffee machine with number of outlets
+	Init(outlets int) *CoffeeMachineService
+
+	// fetch the recipe of the order, and create the beverage
 	MakeDrink(order []string)
+
+	// wait for completion of order and stop
 	Stop()
 }
 
-func (cm *CoffeeMachineService) Init(outlets int) {
+func (cm *CoffeeMachineService) Init(outlets int) *CoffeeMachineService {
 	cm.resultWg.Add(1)
 	go cm.result()
 	cm.createWorkerPool(outlets)
+	return cm
 }
 
 func (cm *CoffeeMachineService) MakeDrink(order []string) {
@@ -68,6 +75,7 @@ func (cm *CoffeeMachineService) MakeDrink(order []string) {
 	go cm.process(order)
 }
 
+// Add order to Orders chan
 func (cm *CoffeeMachineService) process(order []string) {
 	for _, s := range order {
 		cm.Orders <- s
@@ -76,7 +84,10 @@ func (cm *CoffeeMachineService) process(order []string) {
 	cm.producerWg.Done()
 }
 
+// Process the Order and create the recipe
 func (cm *CoffeeMachineService) worker() {
+	defer cm.workerWg.Done()
+
 	for order := range cm.Orders {
 		recipe, err := cm.recipeSvc.ByName(order)
 		if err != nil {
@@ -90,10 +101,9 @@ func (cm *CoffeeMachineService) worker() {
 			}
 		}
 	}
-
-	cm.workerWg.Done()
 }
 
+// Process the Recipes and create the beverage
 func (cm *CoffeeMachineService) result() {
 	defer cm.resultWg.Done()
 
@@ -107,13 +117,15 @@ func (cm *CoffeeMachineService) result() {
 	}
 }
 
-func (cm *CoffeeMachineService) createWorkerPool(noOfWorkers int) {
-	for i := 0; i < noOfWorkers; i++ {
+// Create workers equal to number of outlets
+func (cm *CoffeeMachineService) createWorkerPool(noOfOutlets int) {
+	for i := 0; i < noOfOutlets; i++ {
 		cm.workerWg.Add(1)
 		go cm.worker()
 	}
 }
 
+// Wait for all orders to get completed and stop the machine
 func (cm *CoffeeMachineService) Stop() {
 	cm.producerWg.Wait()
 	close(cm.Orders)
@@ -124,6 +136,7 @@ func (cm *CoffeeMachineService) Stop() {
 	cm.resultWg.Wait()
 }
 
+// dispense the contents of the order and return the recipe
 func (cm *CoffeeMachineService) DispenseIngredient(recipe coffee_machine.Recipe) (*coffee_machine.Recipe, error) {
 	cm.mutex.Lock()
 	defer cm.mutex.Unlock()

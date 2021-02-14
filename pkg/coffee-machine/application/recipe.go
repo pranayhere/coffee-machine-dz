@@ -8,6 +8,7 @@ type RecipeService struct {
 	recipeRepo cm.RecipeRepo
 }
 
+// New
 func NewRecipeService(ingredientSvc IngredientSvc, repo cm.RecipeRepo) *RecipeService {
 	return &RecipeService{
 		ingredientSvc: ingredientSvc,
@@ -16,7 +17,10 @@ func NewRecipeService(ingredientSvc IngredientSvc, repo cm.RecipeRepo) *RecipeSe
 }
 
 type RecipeSvc interface {
+	// Save the Recipe
 	Save(name string, ingredients map[string]int) error
+
+	// Return the Recipe by name
 	ByName(name string) (*cm.Recipe, error)
 }
 

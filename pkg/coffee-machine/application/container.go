@@ -8,6 +8,7 @@ type ContainerService struct {
 	containerRepo cm.ContainerRepo
 }
 
+// New
 func NewContainerService(ingredientSvc IngredientSvc, repo cm.ContainerRepo) *ContainerService {
 	return &ContainerService{
 		ingredientSvc: ingredientSvc,
@@ -16,11 +17,19 @@ func NewContainerService(ingredientSvc IngredientSvc, repo cm.ContainerRepo) *Co
 }
 
 type ContainerSvc interface {
+	// Save the container
 	Save(cap, qty int, ingredientName string) error
+
+	// Update the container
 	Update(container *cm.Container) error
+
+	// Return the container by name
 	ByName(name string) (*cm.Container, error)
+
+	// Refill the container
 	Refill(containerName string, qty int) error
 }
+
 
 func (cs *ContainerService) Save(cap, qty int, ingredientName string) error {
 	err := cs.ingredientSvc.Save(ingredientName)

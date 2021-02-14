@@ -10,6 +10,7 @@ type Container struct {
 	Ingredient Ingredient
 }
 
+// New
 func NewContainer(cap, qty int, ingredient Ingredient) (*Container, error) {
 	return &Container{
 		Cap:        cap,
@@ -18,6 +19,7 @@ func NewContainer(cap, qty int, ingredient Ingredient) (*Container, error) {
 	}, nil
 }
 
+// Dispense the Ingredient
 func (ic *Container) Dispense(qty int) (Ingredient, error) {
 	if qty > ic.Qty {
 		return Ingredient{}, ErrNotEnoughIngredient
@@ -28,6 +30,9 @@ func (ic *Container) Dispense(qty int) (Ingredient, error) {
 }
 
 type ContainerRepo interface {
+	// Save the container
 	Save(container *Container) error
+
+	// Return the container By Name
 	ByName(name string) (*Container, error)
 }

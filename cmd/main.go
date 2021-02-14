@@ -8,10 +8,9 @@ import (
 )
 
 func main() {
-	machine := createCoffeeMachine()
+	machine := createCoffeeMachine().Init(3)
 	drinks := []string{"hot_tea", "hot_coffee", "green_tea", "black_tea"}
 
-	machine.Init(3)
 	machine.MakeDrink(drinks)
 	machine.Stop()
 }
