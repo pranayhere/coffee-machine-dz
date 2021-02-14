@@ -20,10 +20,6 @@ func createCoffeeMachine() *app.CoffeeMachineService {
 	ingdRepo := cm.NewIngredientMemRepo()
 	ingdSvc := app.NewIngredientService(ingdRepo)
 
-	if err := fixture.LoadIngredient(*ingdSvc); err != nil {
-		panic(err)
-	}
-
 	containerRepo := cm.NewContainerMemRepo()
 	containerSvc := app.NewContainerService(ingdSvc, containerRepo)
 

@@ -2,25 +2,6 @@ package fixture
 
 import app "coffee-machine-dz/pkg/coffee-machine/application"
 
-func LoadIngredient(ingdSvc app.IngredientService) error {
-	if err := ingdSvc.Save("hot_water"); err != nil {
-		return err
-	}
-	if err := ingdSvc.Save("hot_milk"); err != nil {
-		return err
-	}
-	if err := ingdSvc.Save("ginger_syrup"); err != nil {
-		return err
-	}
-	if err := ingdSvc.Save("sugar_syrup"); err != nil {
-		return err
-	}
-	if err := ingdSvc.Save("tea_leaves_syrup"); err != nil {
-		return err
-	}
-	return nil
-}
-
 func LoadContainer(containerSvc app.ContainerService) error {
 	if err := containerSvc.Save(500, 500, "hot_water"); err != nil {
 		return err

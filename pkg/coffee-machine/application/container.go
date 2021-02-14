@@ -23,11 +23,12 @@ type ContainerSvc interface {
 }
 
 func (cs *ContainerService) Save(cap, qty int, ingredientName string) error {
-	ingd, err := cs.ingredientSvc.ByName(ingredientName)
+	err := cs.ingredientSvc.Save(ingredientName)
 	if err != nil {
 		return err
 	}
 
+	ingd, _ := cs.ingredientSvc.ByName(ingredientName)
 	container, err := cm.NewContainer(cap, qty, *ingd)
 	if err != nil {
 		return err
