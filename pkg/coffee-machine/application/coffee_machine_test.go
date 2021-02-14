@@ -11,7 +11,7 @@ import (
 func TestCoffeeMachineService(t *testing.T) {
 	coffeeMachine := createCoffeeMachine()
 
-	coffeeMachine.Start()
+	coffeeMachine.Init(1)
 
 	close(coffeeMachine.Orders)
 }
@@ -25,14 +25,14 @@ func createCoffeeMachine() *app.CoffeeMachineService {
 	}
 
 	containerRepo := cm.NewContainerMemRepo()
-	containerSvc := app.NewContainerService(*ingdSvc, containerRepo)
+	containerSvc := app.NewContainerService(ingdSvc, containerRepo)
 
 	if err := fixture.LoadContainer(*containerSvc); err != nil {
 		panic(err)
 	}
 
 	recipeRepo := cm.NewRecipeMemRepo()
-	recipeSvc := app.NewRecipeService(*ingdSvc, recipeRepo)
+	recipeSvc := app.NewRecipeService(ingdSvc, recipeRepo)
 
 	if err := fixture.LoadRecipe(*recipeSvc); err != nil {
 		panic(err)
@@ -40,5 +40,5 @@ func createCoffeeMachine() *app.CoffeeMachineService {
 
 	alertingSvc := alerting.NewAlertingService()
 
-	return app.NewCoffeeMachineService(*ingdSvc, *containerSvc, *recipeSvc, *alertingSvc)
+	return app.NewCoffeeMachineService(ingdSvc, containerSvc, recipeSvc, alertingSvc)
 }

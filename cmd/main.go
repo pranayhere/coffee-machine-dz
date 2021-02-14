@@ -9,20 +9,11 @@ import (
 
 func main() {
 	machine := createCoffeeMachine()
-	drinks := []string{"hot_coffee", "hot_tea", "black_tea"}
+	drinks := []string{"hot_tea", "hot_coffee", "green_tea", "black_tea"}
 
-	//var wg sync.WaitGroup
-	//wg.Add(1)
-	//
-	//go func() {
-	machine.Start()
+	machine.Init(3)
 	machine.MakeDrink(drinks)
 	machine.Stop()
-
-	//	wg.Done()
-	//}()
-	//
-	//wg.Wait()
 }
 
 func createCoffeeMachine() *app.CoffeeMachineService {
@@ -34,14 +25,14 @@ func createCoffeeMachine() *app.CoffeeMachineService {
 	}
 
 	containerRepo := cm.NewContainerMemRepo()
-	containerSvc := app.NewContainerService(*ingdSvc, containerRepo)
+	containerSvc := app.NewContainerService(ingdSvc, containerRepo)
 
 	if err := fixture.LoadContainer(*containerSvc); err != nil {
 		panic(err)
 	}
 
 	recipeRepo := cm.NewRecipeMemRepo()
-	recipeSvc := app.NewRecipeService(*ingdSvc, recipeRepo)
+	recipeSvc := app.NewRecipeService(ingdSvc, recipeRepo)
 
 	if err := fixture.LoadRecipe(*recipeSvc); err != nil {
 		panic(err)
@@ -49,5 +40,5 @@ func createCoffeeMachine() *app.CoffeeMachineService {
 
 	alertingSvc := alerting.NewAlertingService()
 
-	return app.NewCoffeeMachineService(*ingdSvc, *containerSvc, *recipeSvc, *alertingSvc)
+	return app.NewCoffeeMachineService(ingdSvc, containerSvc, recipeSvc, alertingSvc)
 }

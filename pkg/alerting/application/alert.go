@@ -11,6 +11,10 @@ func NewAlertingService() *AlertingService {
 	return &AlertingService{}
 }
 
+type AlertingSvc interface {
+	Alert(err error)
+}
+
 func (as *AlertingService) Alert(err error) {
 	alert := alerting.NewAlert(err)
 	fmt.Println("Alerting svc : ", alert.Err.Error())

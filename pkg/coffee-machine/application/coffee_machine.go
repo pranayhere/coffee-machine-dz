@@ -9,10 +9,10 @@ import (
 )
 
 type CoffeeMachineService struct {
-	ingdSvc      IngredientService
-	containerSvc ContainerService
-	recipeSvc    RecipeService
-	alertingSvc  alerting.AlertingService
+	ingdSvc      IngredientSvc
+	containerSvc ContainerSvc
+	recipeSvc    RecipeSvc
+	alertingSvc  alerting.AlertingSvc
 
 	Orders  chan string      // jobs
 	Recipes chan RecipeError // results
@@ -27,7 +27,7 @@ type RecipeError struct {
 	err    error
 }
 
-func NewCoffeeMachineService(ingdSvc IngredientService, containerSvc ContainerService, recipeSvc RecipeService, alertingSvc alerting.AlertingService) *CoffeeMachineService {
+func NewCoffeeMachineService(ingdSvc IngredientSvc, containerSvc ContainerSvc, recipeSvc RecipeSvc, alertingSvc alerting.AlertingSvc) *CoffeeMachineService {
 	var workerWg sync.WaitGroup
 	var producerWg sync.WaitGroup
 	var resultWg sync.WaitGroup
@@ -48,15 +48,15 @@ func NewCoffeeMachineService(ingdSvc IngredientService, containerSvc ContainerSe
 }
 
 type CoffeeMachineSvc interface {
-	Start()
+	Init(outlets int)
 	MakeDrink(order []string)
 	Stop()
 }
 
-func (cm *CoffeeMachineService) Start() {
+func (cm *CoffeeMachineService) Init(outlets int) {
 	cm.resultWg.Add(1)
 	go cm.result()
-	cm.createWorkerPool(3)
+	cm.createWorkerPool(outlets)
 }
 
 func (cm *CoffeeMachineService) MakeDrink(order []string) {
@@ -94,11 +94,11 @@ func (cm *CoffeeMachineService) result() {
 	defer cm.resultWg.Done()
 
 	for recipe := range cm.Recipes {
-		fmt.Println("Result Error is : ", recipe.recipe, " err : ", recipe.err)
+		//fmt.Println("Result Error is : ", recipe.recipe, " err : ", recipe.err)
 		if recipe.err != nil {
 			cm.alertingSvc.Alert(recipe.err)
 		} else {
-			fmt.Println("serving you delicious " + recipe.recipe.Name)
+			fmt.Println(recipe.recipe.Name + " is prepared")
 		}
 	}
 }

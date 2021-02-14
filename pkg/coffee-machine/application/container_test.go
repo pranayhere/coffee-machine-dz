@@ -58,7 +58,7 @@ func createContainerSvc() *application.ContainerService {
 	ingdSvc := application.NewIngredientService(ingdRepo)
 
 	containerRepo := infra.NewContainerMemRepo()
-	containerSvc := application.NewContainerService(*ingdSvc, containerRepo)
+	containerSvc := application.NewContainerService(ingdSvc, containerRepo)
 
 	_ = ingdSvc.Save("hot_water")
 

@@ -3,16 +3,21 @@ package application
 import cm "coffee-machine-dz/pkg/coffee-machine/domain/coffee-machine"
 
 type RecipeService struct {
-	ingredientSvc IngredientService
+	ingredientSvc IngredientSvc
 
 	recipeRepo cm.RecipeRepo
 }
 
-func NewRecipeService(ingredientSvc IngredientService, repo cm.RecipeRepo) *RecipeService {
+func NewRecipeService(ingredientSvc IngredientSvc, repo cm.RecipeRepo) *RecipeService {
 	return &RecipeService{
 		ingredientSvc: ingredientSvc,
 		recipeRepo:    repo,
 	}
+}
+
+type RecipeSvc interface {
+	Save(name string, ingredients map[string]int) error
+	ByName(name string) (*cm.Recipe, error)
 }
 
 func (rs *RecipeService) Save(name string, ingredients map[string]int) error {

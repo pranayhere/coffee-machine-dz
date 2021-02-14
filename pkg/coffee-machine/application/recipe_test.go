@@ -24,7 +24,7 @@ func createRecipeSvc() *application.RecipeService {
 	ingdSvc := application.NewIngredientService(ingdRepo)
 
 	recipeRepo := infra.NewRecipeMemRepo()
-	recipeSvc := application.NewRecipeService(*ingdSvc, recipeRepo)
+	recipeSvc := application.NewRecipeService(ingdSvc, recipeRepo)
 	_ = ingdSvc.Save("hot_water")
 
 	return recipeSvc

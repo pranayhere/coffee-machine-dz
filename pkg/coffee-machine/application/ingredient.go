@@ -12,6 +12,11 @@ func NewIngredientService(repo cm.IngredientRepo) *IngredientService {
 	}
 }
 
+type IngredientSvc interface {
+	Save(name string) error
+	ByName(name string) (*cm.Ingredient, error)
+}
+
 func (in *IngredientService) Save(name string) error {
 	ingd, err := cm.NewIngredient(name)
 	if err != nil {

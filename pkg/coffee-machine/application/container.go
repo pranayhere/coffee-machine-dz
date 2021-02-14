@@ -3,16 +3,23 @@ package application
 import cm "coffee-machine-dz/pkg/coffee-machine/domain/coffee-machine"
 
 type ContainerService struct {
-	ingredientSvc IngredientService
+	ingredientSvc IngredientSvc
 
 	containerRepo cm.ContainerRepo
 }
 
-func NewContainerService(ingredientSvc IngredientService, repo cm.ContainerRepo) *ContainerService {
+func NewContainerService(ingredientSvc IngredientSvc, repo cm.ContainerRepo) *ContainerService {
 	return &ContainerService{
 		ingredientSvc: ingredientSvc,
 		containerRepo: repo,
 	}
+}
+
+type ContainerSvc interface {
+	Save(cap, qty int, ingredientName string) error
+	Update(container *cm.Container) error
+	ByName(name string) (*cm.Container, error)
+	Refill(containerName string, qty int) error
 }
 
 func (cs *ContainerService) Save(cap, qty int, ingredientName string) error {
