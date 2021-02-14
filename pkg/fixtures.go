@@ -42,10 +42,10 @@ func LoadContainer(containerSvc app.ContainerService) error {
 
 func LoadRecipe(recipeSvc app.RecipeService) error {
 	err := recipeSvc.Save("hot_tea", map[string]int{
-		"hot_water": 200,
-		"hot_milk": 100,
-		"ginger_syrup": 10,
-		"sugar_syrup": 10,
+		"hot_water":        200,
+		"hot_milk":         100,
+		"ginger_syrup":     10,
+		"sugar_syrup":      10,
 		"tea_leaves_syrup": 30,
 	})
 	if err != nil {
@@ -53,10 +53,10 @@ func LoadRecipe(recipeSvc app.RecipeService) error {
 	}
 
 	err = recipeSvc.Save("hot_coffee", map[string]int{
-		"hot_water": 100,
-		"ginger_syrup": 30,
-		"hot_milk": 400,
-		"sugar_syrup": 50,
+		"hot_water":        100,
+		"ginger_syrup":     30,
+		"hot_milk":         400,
+		"sugar_syrup":      50,
 		"tea_leaves_syrup": 30,
 	})
 	if err != nil {
@@ -64,9 +64,9 @@ func LoadRecipe(recipeSvc app.RecipeService) error {
 	}
 
 	err = recipeSvc.Save("black_tea", map[string]int{
-		"hot_water": 300,
-		"ginger_syrup": 30,
-		"sugar_syrup": 50,
+		"hot_water":        300,
+		"ginger_syrup":     30,
+		"sugar_syrup":      50,
 		"tea_leaves_syrup": 30,
 	})
 	if err != nil {
@@ -74,9 +74,9 @@ func LoadRecipe(recipeSvc app.RecipeService) error {
 	}
 
 	err = recipeSvc.Save("green_tea", map[string]int{
-		"hot_water": 100,
-		"ginger_syrup": 30,
-		"sugar_syrup": 50,
+		"hot_water":        100,
+		"ginger_syrup":     30,
+		"sugar_syrup":      50,
 		"tea_leaves_syrup": 30,
 	})
 	if err != nil {

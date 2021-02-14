@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-type AlertingService struct {}
+type AlertingService struct{}
 
 func NewAlertingService() *AlertingService {
 	return &AlertingService{}

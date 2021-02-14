@@ -31,8 +31,8 @@ func (rs *RecipeService) Save(name string, ingredients map[string]int) error {
 
 		contents = append(contents, *content)
 	}
-	
-	recipe, err  := cm.NewRecipe(name, contents)
+
+	recipe, err := cm.NewRecipe(name, contents)
 	if err != nil {
 		return err
 	}
@@ -41,7 +41,7 @@ func (rs *RecipeService) Save(name string, ingredients map[string]int) error {
 	if err != nil {
 		return err
 	}
-	
+
 	return nil
 }
 

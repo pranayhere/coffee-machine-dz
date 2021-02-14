@@ -26,7 +26,6 @@ func TestNewContainer_Dispense(t *testing.T) {
 	testContainer.Dispense(100)
 	assert.EqualValues(t, 400, testContainer.Qty)
 
-
 	_, err = testContainer.Dispense(500)
 	assert.Error(t, err)
 }

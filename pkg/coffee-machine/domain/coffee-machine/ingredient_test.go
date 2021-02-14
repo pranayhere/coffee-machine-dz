@@ -7,20 +7,20 @@ import (
 )
 
 func TestNewIngredient(t *testing.T) {
-	testCases := []struct{
+	testCases := []struct {
 		TestName string
-		
+
 		Name string
-		
+
 		ExpectedErr bool
-	} {
+	}{
 		{
-			TestName: "valid",
-			Name:     "hot_milk",
+			TestName:    "valid",
+			Name:        "hot_milk",
 			ExpectedErr: false,
 		},
 	}
-	
+
 	for _, c := range testCases {
 		t.Run(c.TestName, func(t *testing.T) {
 			ingd, err := cm.NewIngredient(c.Name)

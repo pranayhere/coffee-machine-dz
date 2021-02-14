@@ -5,13 +5,13 @@ type Beverage struct {
 }
 
 type Recipe struct {
-	Name string
+	Name     string
 	Contents []Content
 }
 
 type Content struct {
 	Ingredient Ingredient
-	Qty int
+	Qty        int
 }
 
 func NewBeverage(name string, recipe Recipe) *Beverage {

@@ -11,7 +11,7 @@ func TestRecipeMemRepo(t *testing.T) {
 	repo := infra.NewRecipeMemRepo()
 
 	recipe := addRecipe(t, repo, "hot_coffee", map[string]int{
-		"hot_water": 100,
+		"hot_water":    100,
 		"ginger_syrup": 30,
 	})
 

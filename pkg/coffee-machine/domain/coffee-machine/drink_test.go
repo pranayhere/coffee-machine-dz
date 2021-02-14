@@ -16,13 +16,13 @@ func TestNewContent(t *testing.T) {
 }
 
 func TestNewRecipe(t *testing.T) {
-	 contents := createRecipeContent(t)
+	contents := createRecipeContent(t)
 
-	 recipe, err := cm.NewRecipe("coffee", contents)
-	 assert.NoError(t, err)
+	recipe, err := cm.NewRecipe("coffee", contents)
+	assert.NoError(t, err)
 
-	 assert.EqualValues(t, "coffee", recipe.Name)
-	 assert.EqualValues(t, contents, recipe.Contents)
+	assert.EqualValues(t, "coffee", recipe.Name)
+	assert.EqualValues(t, contents, recipe.Contents)
 }
 
 func createRecipeContent(t *testing.T) []cm.Content {

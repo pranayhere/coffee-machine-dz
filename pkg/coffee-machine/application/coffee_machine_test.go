@@ -1,28 +1,19 @@
-package main
+package application_test
 
 import (
-	"coffee-machine-dz/pkg"
+	fixture "coffee-machine-dz/pkg"
 	alerting "coffee-machine-dz/pkg/alerting/application"
 	app "coffee-machine-dz/pkg/coffee-machine/application"
 	cm "coffee-machine-dz/pkg/coffee-machine/infrastructure/coffee-machine"
+	"testing"
 )
 
-func main() {
-	machine := createCoffeeMachine()
-	drinks := []string{"hot_coffee", "hot_tea", "black_tea"}
+func TestCoffeeMachineService(t *testing.T) {
+	coffeeMachine := createCoffeeMachine()
 
-	//var wg sync.WaitGroup
-	//wg.Add(1)
-	//
-	//go func() {
-	machine.Start()
-	machine.MakeDrink(drinks)
-	machine.Stop()
+	coffeeMachine.Start()
 
-	//	wg.Done()
-	//}()
-	//
-	//wg.Wait()
+	close(coffeeMachine.Orders)
 }
 
 func createCoffeeMachine() *app.CoffeeMachineService {

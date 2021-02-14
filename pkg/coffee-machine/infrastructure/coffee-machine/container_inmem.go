@@ -10,13 +10,13 @@ var ErrContainerNotFound = errors.New("unknown container")
 
 type ContainerMemRepo struct {
 	containers map[string]cm.Container
-	rwm     sync.RWMutex
+	rwm        sync.RWMutex
 }
 
 func NewContainerMemRepo() *ContainerMemRepo {
 	return &ContainerMemRepo{
 		containers: make(map[string]cm.Container),
-		rwm:     sync.RWMutex{},
+		rwm:        sync.RWMutex{},
 	}
 }
 
