@@ -77,7 +77,7 @@ func LoadRecipe(recipeSvc app.RecipeService) error {
 		"hot_water":        100,
 		"ginger_syrup":     30,
 		"sugar_syrup":      50,
-		"tea_leaves_syrup": 30,
+		"green_mixture":    30,
 	})
 	if err != nil {
 		return err

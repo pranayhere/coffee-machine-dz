@@ -4,7 +4,6 @@ import (
 	alerting "coffee-machine-dz/pkg/alerting/application"
 	coffee_machine "coffee-machine-dz/pkg/coffee-machine/domain/coffee-machine"
 	"errors"
-	"fmt"
 	"sync"
 )
 
@@ -20,6 +19,8 @@ type CoffeeMachineService struct {
 	workerWg   sync.WaitGroup
 	producerWg sync.WaitGroup
 	resultWg   sync.WaitGroup
+
+	mutex      sync.Mutex
 }
 
 type RecipeError struct {
@@ -31,6 +32,7 @@ func NewCoffeeMachineService(ingdSvc IngredientSvc, containerSvc ContainerSvc, r
 	var workerWg sync.WaitGroup
 	var producerWg sync.WaitGroup
 	var resultWg sync.WaitGroup
+	var mutex sync.Mutex
 
 	return &CoffeeMachineService{
 		ingdSvc:      ingdSvc,
@@ -44,6 +46,8 @@ func NewCoffeeMachineService(ingdSvc IngredientSvc, containerSvc ContainerSvc, r
 		workerWg:   workerWg,
 		producerWg: producerWg,
 		resultWg:   resultWg,
+
+		mutex: mutex,
 	}
 }
 
@@ -78,11 +82,11 @@ func (cm *CoffeeMachineService) worker() {
 		if err != nil {
 			cm.Recipes <- RecipeError{recipe: nil, err: err}
 		} else {
-			err = cm.DispenseIngredient(*recipe)
+			r, err := cm.DispenseIngredient(*recipe)
 			if err != nil {
 				cm.Recipes <- RecipeError{recipe: nil, err: err}
 			} else {
-				cm.Recipes <- RecipeError{recipe: recipe, err: nil}
+				cm.Recipes <- RecipeError{recipe: r, err: nil}
 			}
 		}
 	}
@@ -93,12 +97,12 @@ func (cm *CoffeeMachineService) worker() {
 func (cm *CoffeeMachineService) result() {
 	defer cm.resultWg.Done()
 
-	for recipe := range cm.Recipes {
-		//fmt.Println("Result Error is : ", recipe.recipe, " err : ", recipe.err)
-		if recipe.err != nil {
-			cm.alertingSvc.Alert(recipe.err)
+	for r := range cm.Recipes {
+		if r.err != nil {
+			cm.alertingSvc.Alert(r.err)
 		} else {
-			fmt.Println(recipe.recipe.Name + " is prepared")
+			beverage := coffee_machine.NewBeverage(r.recipe.Name, *r.recipe)
+			beverage.Serve()
 		}
 	}
 }
@@ -120,27 +124,26 @@ func (cm *CoffeeMachineService) Stop() {
 	cm.resultWg.Wait()
 }
 
-func (cm *CoffeeMachineService) DispenseIngredient(recipe coffee_machine.Recipe) error {
-	for _, content := range recipe.Contents {
-		container, _ := cm.containerSvc.ByName(content.Ingredient.Name)
-		if container.Qty < content.Qty {
-			return errors.New("Not enough Ingredient : " + container.Ingredient.Name)
-		}
-	}
+func (cm *CoffeeMachineService) DispenseIngredient(recipe coffee_machine.Recipe) (*coffee_machine.Recipe, error) {
+	cm.mutex.Lock()
+	defer cm.mutex.Unlock()
 
 	for _, content := range recipe.Contents {
-		container, _ := cm.containerSvc.ByName(content.Ingredient.Name)
-
-		_, err := container.Dispense(content.Qty)
+		container, err := cm.containerSvc.ByName(content.Ingredient.Name)
 		if err != nil {
-			return errors.New("Not enough Ingredient : " + container.Ingredient.Name)
+			return nil, errors.New(recipe.Name + " cannot be prepared because " + content.Ingredient.Name + " is not available")
+		}
+
+		_, err = container.Dispense(content.Qty)
+		if errors.Is(err, coffee_machine.ErrNotEnoughIngredient) {
+			return nil, errors.New(recipe.Name + " cannot be prepared because item " + container.Ingredient.Name + " is not sufficient")
 		}
 
 		err = cm.containerSvc.Update(container)
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
 
-	return nil
+	return &recipe, nil
 }

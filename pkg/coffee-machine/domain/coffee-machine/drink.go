@@ -1,6 +1,9 @@
 package coffee_machine
 
+import "fmt"
+
 type Beverage struct {
+	Name   string
 	Recipe Recipe
 }
 
@@ -15,7 +18,7 @@ type Content struct {
 }
 
 func NewBeverage(name string, recipe Recipe) *Beverage {
-	return &Beverage{Recipe: recipe}
+	return &Beverage{Name: name, Recipe: recipe}
 }
 
 func NewRecipe(name string, contents []Content) (*Recipe, error) {
@@ -24,6 +27,10 @@ func NewRecipe(name string, contents []Content) (*Recipe, error) {
 
 func NewContent(ingredient Ingredient, qty int) (*Content, error) {
 	return &Content{Ingredient: ingredient, Qty: qty}, nil
+}
+
+func (b *Beverage) Serve()  {
+	fmt.Println(b.Name + " is prepared")
 }
 
 type RecipeRepo interface {

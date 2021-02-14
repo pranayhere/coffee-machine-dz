@@ -6,7 +6,7 @@ import (
 	"sync"
 )
 
-var ErrContainerNotFound = errors.New("unknown container")
+var ErrContainerNotFound = errors.New("not available")
 
 type ContainerMemRepo struct {
 	containers map[string]cm.Container

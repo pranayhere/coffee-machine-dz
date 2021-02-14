@@ -17,5 +17,5 @@ type AlertingSvc interface {
 
 func (as *AlertingService) Alert(err error) {
 	alert := alerting.NewAlert(err)
-	fmt.Println("Alerting svc : ", alert.Err.Error())
+	fmt.Println(alert.Err.Error())
 }

@@ -24,11 +24,12 @@ func (rs *RecipeService) Save(name string, ingredients map[string]int) error {
 	contents := make([]cm.Content, 0)
 
 	for name, qty := range ingredients {
-		ingd, err := rs.ingredientSvc.ByName(name)
+		err := rs.ingredientSvc.Save(name)
 		if err != nil {
 			return err
 		}
 
+		ingd, _ := rs.ingredientSvc.ByName(name)
 		content, err := cm.NewContent(*ingd, qty)
 		if err != nil {
 			return err
