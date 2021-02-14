@@ -14,11 +14,9 @@ type CoffeeMachineService struct {
 	alertingSvc  alerting.AlertingSvc
 
 	Orders  chan string      // jobs
-	Recipes chan RecipeError // results
 
 	workerWg   sync.WaitGroup
 	producerWg sync.WaitGroup
-	resultWg   sync.WaitGroup
 
 	mutex sync.Mutex
 }
@@ -32,7 +30,6 @@ type RecipeError struct {
 func NewCoffeeMachineService(ingdSvc IngredientSvc, containerSvc ContainerSvc, recipeSvc RecipeSvc, alertingSvc alerting.AlertingSvc) *CoffeeMachineService {
 	var workerWg sync.WaitGroup
 	var producerWg sync.WaitGroup
-	var resultWg sync.WaitGroup
 	var mutex sync.Mutex
 
 	return &CoffeeMachineService{
@@ -42,11 +39,9 @@ func NewCoffeeMachineService(ingdSvc IngredientSvc, containerSvc ContainerSvc, r
 		alertingSvc:  alertingSvc,
 
 		Orders:  make(chan string, 5),
-		Recipes: make(chan RecipeError, 5),
 
 		workerWg:   workerWg,
 		producerWg: producerWg,
-		resultWg:   resultWg,
 
 		mutex: mutex,
 	}
@@ -64,8 +59,6 @@ type CoffeeMachineSvc interface {
 }
 
 func (cm *CoffeeMachineService) Init(outlets int) *CoffeeMachineService {
-	cm.resultWg.Add(1)
-	go cm.result()
 	cm.createWorkerPool(outlets)
 	return cm
 }
@@ -91,31 +84,19 @@ func (cm *CoffeeMachineService) worker() {
 	for order := range cm.Orders {
 		recipe, err := cm.recipeSvc.ByName(order)
 		if err != nil {
-			cm.Recipes <- RecipeError{recipe: nil, err: err}
+			cm.alertingSvc.Alert(err)
 		} else {
 			r, err := cm.DispenseIngredient(*recipe)
 			if err != nil {
-				cm.Recipes <- RecipeError{recipe: nil, err: err}
+				cm.alertingSvc.Alert(err)
 			} else {
-				cm.Recipes <- RecipeError{recipe: r, err: nil}
+				beverage := coffee_machine.NewBeverage(r.Name, *r)
+				beverage.Serve()
 			}
 		}
 	}
 }
 
-// Process the Recipes and create the beverage
-func (cm *CoffeeMachineService) result() {
-	defer cm.resultWg.Done()
-
-	for r := range cm.Recipes {
-		if r.err != nil {
-			cm.alertingSvc.Alert(r.err)
-		} else {
-			beverage := coffee_machine.NewBeverage(r.recipe.Name, *r.recipe)
-			beverage.Serve()
-		}
-	}
-}
 
 // Create workers equal to number of outlets
 func (cm *CoffeeMachineService) createWorkerPool(noOfOutlets int) {
@@ -131,9 +112,6 @@ func (cm *CoffeeMachineService) Stop() {
 	close(cm.Orders)
 
 	cm.workerWg.Wait()
-	close(cm.Recipes)
-
-	cm.resultWg.Wait()
 }
 
 // dispense the contents of the order and return the recipe
