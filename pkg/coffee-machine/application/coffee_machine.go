@@ -20,7 +20,7 @@ type CoffeeMachineService struct {
 	producerWg sync.WaitGroup
 	resultWg   sync.WaitGroup
 
-	mutex      sync.Mutex
+	mutex sync.Mutex
 }
 
 type RecipeError struct {

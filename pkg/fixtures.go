@@ -55,10 +55,10 @@ func LoadRecipe(recipeSvc app.RecipeService) error {
 	}
 
 	err = recipeSvc.Save("green_tea", map[string]int{
-		"hot_water":        100,
-		"ginger_syrup":     30,
-		"sugar_syrup":      50,
-		"green_mixture":    30,
+		"hot_water":     100,
+		"ginger_syrup":  30,
+		"sugar_syrup":   50,
+		"green_mixture": 30,
 	})
 	if err != nil {
 		return err

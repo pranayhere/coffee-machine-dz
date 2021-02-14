@@ -33,7 +33,7 @@ func NewContent(ingredient Ingredient, qty int) (*Content, error) {
 }
 
 // Serve the Beverage
-func (b *Beverage) Serve()  {
+func (b *Beverage) Serve() {
 	fmt.Println(b.Name + " is prepared")
 }
 
